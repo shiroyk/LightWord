@@ -17,7 +17,8 @@ const router = new VueRouter({
       name: 'index',
       component: Index,
       meta: {
-        title: 'LightWord'
+        title: 'LightWord',
+        color: '#844357',
       }
     },
     {
@@ -26,7 +27,8 @@ const router = new VueRouter({
       component: Home,
       meta: {
         title: 'Home',
-        requireAuth: true
+        requireAuth: true,
+        color: '#1565C0'
       }
     },
     {
@@ -35,7 +37,8 @@ const router = new VueRouter({
       component: Help,
       meta: {
         title: 'Help',
-        requireAuth: true
+        requireAuth: true,
+        color: '#1565C0'
       }
     },
     {
@@ -44,7 +47,8 @@ const router = new VueRouter({
       component: Practice,
       meta: {
         title: 'Practice',
-        requireAuth: true
+        requireAuth: true,
+        color: '#1565C0'
       }
     },
     {
@@ -53,7 +57,8 @@ const router = new VueRouter({
       component: Setting,
       meta: {
         title: 'Setting',
-        requireAuth: true
+        requireAuth: true,
+        color: '#1565C0'
       }
     }
   ]
@@ -62,6 +67,9 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title
+  }
+  if (to.meta.color) {
+    document.querySelector("meta[name=theme-color]").setAttribute("content", to.meta.color)
   }
   if (to.meta.requireAuth) {
     const token = store.state.auth.token
