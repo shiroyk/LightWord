@@ -1,0 +1,89 @@
+<template>
+  <v-form ref="form" v-model="valid" lazy-validation>
+    <div style="padding: 16px 16px 0px 16px">
+      <v-text-field
+        v-model="username"
+        :counter="10"
+        :rules="nameRules"
+        label="Username"
+        required
+        outlined
+        rounded
+        dense
+        :error-messages="messages"
+        @focus="clearMessages"
+        v-on:input="clearMessages"
+      ></v-text-field>
+
+      <v-text-field
+        v-model="usermail"
+        :rules="emailRules"
+        label="Email"
+        required
+        outlined
+        rounded
+        dense
+      ></v-text-field>
+
+      <v-text-field
+        v-model="password"
+        :rules="passRules"
+        :counter="16"
+        :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="show ? 'text' : 'password'"
+        label="Password"
+        required
+        outlined
+        rounded
+        dense
+      ></v-text-field>
+    </div>
+    <v-btn :disabled="!valid" color="success" @click="register" tile block>Register</v-btn>
+  </v-form>
+</template>
+
+<script>
+import { mapState } from "vuex"
+export default {
+  data: () => ({
+    valid: true,
+    show: false,
+    username: "",
+    nameRules: [
+      v => !!v || "Usuername is required",
+      v => (v && v.length <= 10) || "Username must be less than 10 characters"
+    ],
+    usermail: "",
+    emailRules: [
+      v => !!v || "Email is required",
+      v =>
+        /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/.test(v) ||
+        "E-mail must be valid"
+    ],
+    password: "",
+    passRules: [
+      v => !!v || "Password is required",
+      v => (v && v.length >= 6) || "Password must have 6+ characters",
+      v => (v && v.length <= 16) || "Password must be less than 16 characters"
+    ]
+  }),
+  computed: {
+    ...mapState({
+      messages: state => state.auth.register.messages
+    })
+  },
+  methods: {
+    register() {
+      this.$store.dispatch("register", {
+        username: this.username,
+        usermail: this.usermail,
+        password: this.password
+      }).then(() => { this.$router.push('/home') })
+       .catch((error) => { console.log(error) })
+    },
+    clearMessages() {
+      this.$store.commit("registerMessage", []);
+    }
+  }
+};
+</script>
