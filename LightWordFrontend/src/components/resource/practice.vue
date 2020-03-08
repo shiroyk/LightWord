@@ -22,7 +22,7 @@
           <v-overlay absolute :value="overlay" opacity="0.6">
             <div class="mx-auto">
               <p>是否已掌握该单词？</p>
-              <div class="d-flex justify-space-between mx-auto" style="width:6rem">
+              <div class="d-flex justify-space-between mx-auto" style="width:8rem">
                 <v-btn icon @click="overlay = !overlay;graspCard()">
                   是
                 </v-btn>
@@ -132,7 +132,7 @@ export default {
     getResource() {
       this.isLoading = true;
       this.$axios
-        .get("/resource", {})
+        .get("/resource/exercise", {})
         .then(response => {
           this.array = response.data;
           this.readData(this.array[this.card]);
@@ -147,7 +147,7 @@ export default {
     },
     putData(status) {
       this.$axios
-        .put("/resource/practice", {
+        .put("/resource/exercise/status", {
           word: this.wid,
           vtype: this.tid,
           status: status
