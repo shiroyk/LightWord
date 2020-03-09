@@ -60,7 +60,7 @@ const authStore = {
           })
           .catch((error) => {
             if (error.response.status == 400) {
-              commit("registerMessage", error.response.data.error)
+              commit("registerMessage", error.response.data.message)
             }
             reject(error)
           })
