@@ -1,0 +1,13 @@
+FROM python:3.7-alpine
+
+ENV APPDIR=/home/app
+COPY . $APPDIR
+
+RUN apk --no-cache add build-base python-dev py-gevent netcat-openbsd && \
+    pip3 install --no-cache-dir -r $APPDIR/requirements.txt && \
+    apk del python-dev build-base
+
+EXPOSE 5000
+WORKDIR $APPDIR
+
+ENTRYPOINT ["sh", "./entrypoint.sh"]

@@ -1,0 +1,11 @@
+.DS_Store
+.git
+.vscode
+.pylintrc
+dev_env
+__pycache__
+idea
+static/*
+logs/*
+idea.py
+tmp
