@@ -1,6 +1,8 @@
 [submodule "LightWordBackend"]
 	path = LightWordBackend
-	url = git@github.com:shiroyk/LightWordBackend.git
+	url = https://github.com/shiroyk/LightWordBackend.git
+	branch = master
 [submodule "LightWordFrontend"]
 	path = LightWordFrontend
-	url = git@github.com:shiroyk/LightWordFrontend.git
+	url = https://github.com/shiroyk/LightWordFrontend.git
+	branch = master
