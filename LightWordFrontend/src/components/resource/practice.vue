@@ -33,7 +33,6 @@
             </div>
           </v-overlay>
 
-          <span class="mb-4">{{currentWord}}</span>
           <span>{{additional}}</span>
         </div>
         <div
