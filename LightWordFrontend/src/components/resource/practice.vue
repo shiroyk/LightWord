@@ -38,11 +38,11 @@
         </div>
         <div
           class="d-flex flex-column flex-auto"
-          :style="{'font-size': textSize(lsentense+rsentense)}"
+          :style="{'font-size': textSize(lsentence+rsentence)}"
           :class="{'card-body-xs': $vuetify.breakpoint.xs, 'card-body': $vuetify.breakpoint.smAndUp}"
         >
           <div class="flex-auto">
-            <span>{{lsentense}}</span>
+            <span>{{lsentence}}</span>
             <span
               class="input-container"
               :class="{'input-container-correct': correct, 'input-container-wrong': wrong}"
@@ -71,7 +71,7 @@
                 @keyup.enter="nextCard"
               />
             </span>
-            <span>{{rsentense}}</span>
+            <span>{{rsentence}}</span>
           </div>
           <p class="sentence-translation">{{translation}}</p>
         </div>
@@ -115,8 +115,8 @@ export default {
     card: 0,
     currentCard: 0,
     status: "",
-    lsentense: "",
-    rsentense: "",
+    lsentence: "",
+    rsentence: "",
     meaning: "",
     inflection: "",
     additional: "",
@@ -170,8 +170,8 @@ export default {
       this.currentWord = data.example.word;
 
       this.inflection = data.inflection;
-      this.lsentense = data.example.split[0];
-      this.rsentense = data.example.split[1];
+      this.lsentence = data.example.split[0];
+      this.rsentence = data.example.split[1];
       this.translation = data.example.translation;
       this.meaning = data.meaning;
       this.pronounce = data.pronounce;
