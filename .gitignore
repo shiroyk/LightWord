@@ -1,0 +1,11 @@
+.DS_Store
+dev_env/
+__pycache__/
+.vscode/
+logs/*
+/test/
+/db/data/*
+*.db
+*.log
+test.py
+dev.py

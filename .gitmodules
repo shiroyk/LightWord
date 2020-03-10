@@ -1,0 +1,6 @@
+[submodule "LightWordBackend"]
+	path = LightWordBackend
+	url = git@github.com:shiroyk/LightWordBackend.git
+[submodule "LightWordFrontend"]
+	path = LightWordFrontend
+	url = git@github.com:shiroyk/LightWordFrontend.git
