@@ -8,7 +8,9 @@ token_auth = HTTPTokenAuth()
 
 @basic_auth.verify_password
 def verify_password(user, password):
-    user = User.get_uid(user)
+    user = User.query.filter_by(
+        username = user).first() or User.query.filter_by(
+        usermail = user).first()
     if not user:
         return False
     g.user = user

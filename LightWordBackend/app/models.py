@@ -112,18 +112,6 @@ class User(db.Model):
             'usermail': self.usermail
         }
 
-    @staticmethod
-    def user_mail_judge(name_or_mail: str):
-        return re.match(r'\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}', name_or_mail) is not None
-
-    @classmethod
-    def get_uid(cls, name_or_mail: str):            
-        if cls.user_mail_judge(name_or_mail):
-            query = cls.query.filter_by(usermail = name_or_mail).first()
-        else:
-            query = cls.query.filter_by(username = name_or_mail).first()
-        if query: return query
-
     def hash_password(self, password: str):
         self.password_hash = pwd_hash.hash(password)
 
@@ -274,13 +262,13 @@ class UserData(db.Model):
 
     @classmethod
     def user_word_count(cls, uid: int, tid: int):
-        return dict(zip(['count', 'correct', 'wrong'],
-                  cls.query \
-                  .with_entities(func.count(cls.word_id),
-                                 cast(func.sum(cls.correct), Integer),
-                                 cast(func.sum(cls.wrong), Integer)) \
-                  .filter_by(user_id = uid,
-                             vtype_id = tid).first()))
+        return  dict(zip(['count', 'correct', 'wrong'],
+                cls.query \
+                .with_entities(func.count(cls.word_id),
+                                cast(func.sum(cls.correct), Integer),
+                                cast(func.sum(cls.wrong), Integer)) \
+                .filter_by(user_id = uid,
+                            vtype_id = tid).first()))
  
     @classmethod
     def recent_days(cls, uid: int, tid: int, days = 7):
@@ -292,10 +280,10 @@ class UserData(db.Model):
                                  cast(func.sum(cls.wrong), Integer)) \
                   .filter_by(user_id = uid,
                              vtype_id = tid) \
-                  .filter(cls.last_practice >=  daysago) \
+                  .filter(cls.last_practice >= daysago) \
                   .group_by(func.date(cls.last_practice)).all():
                   
-            yield dict(zip(['day','count', 'correct', 'wrong'],
+            yield dict(zip(['day', 'count', 'correct', 'wrong'],
                            [ r.strftime('%m-%d') if isinstance(r, date) else r for r in v ]))
 
     @classmethod

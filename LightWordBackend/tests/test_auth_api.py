@@ -34,6 +34,11 @@ class AuthAPITestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 401)
 
         response = self.client.post('/token', headers = {
+        'Authorization': _basic_auth_str('test@test.com', '123456'),
+        })
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post('/token', headers = {
         'Authorization': _basic_auth_str('test', '123456'),
         })
         self.assertEqual(response.status_code, 200)

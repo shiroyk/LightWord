@@ -79,7 +79,11 @@ def create_user():
     if not 'password' in data or not data.get('password', None).strip():
         errors.append('Please provide a valid password.')
 
-    if User.get_uid(data.get('username')) or User.get_uid(data.get('usermail')):
+    if  User.query.filter_by(
+        username = data.get('username')
+        ).first() or User.query.filter_by(
+        usermail = data.get('usermail')
+        ).first():
         errors.append('Username or Email address already exists')
 
     if errors:
