@@ -1,5 +1,6 @@
 # Light Word
 
+[![Build Status](https://travis-ci.com/shiroyk/LightWord.svg?branch=master)](https://travis-ci.com/shiroyk/LightWord)
 ***
 轻词是仿[Lingvest](https://lingvist.com/)的一个记忆单词的工具，根据艾宾浩斯遗忘曲线周期性的回忆单词。
 

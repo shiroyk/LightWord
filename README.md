@@ -1,6 +1,6 @@
 # Light Word
 
-***
+[![Build Status](https://travis-ci.com/shiroyk/LightWord.svg?branch=master)](https://travis-ci.com/shiroyk/LightWord)<br/>
 [中文](README.zh_CN.md)
 
 ***
