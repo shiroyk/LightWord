@@ -233,19 +233,19 @@ class UserData(db.Model):
             'user_id': uid, 
             'vtype_id': tid
         }
-        utcnow = datetime.utcnow()
+        ten_years = datetime.utcnow() + timedelta(minutes=5126400)
         dataobj = cls.query.filter_by(**datadict).first()
         if dataobj:
             if dataobj.stage < len(cls.forget_time):
                 dataobj.stage += 1
-            dataobj.timestamp = utcnow + timedelta(minutes=5126400)
-            dataobj.last_practice = INITIAL_DATE
+            dataobj.timestamp = ten_years
+            dataobj.last_practice = ten_years
             dataobj.correct += 1
             db.session.commit()
         else:
             dataobj = cls(**datadict)
-            dataobj.timestamp = utcnow + timedelta(minutes=5126400)
-            dataobj.last_practice = INITIAL_DATE
+            dataobj.timestamp = ten_years
+            dataobj.last_practice = ten_years
             db.session.add(dataobj)
             db.session.flush()
         return dataobj.id is not None
