@@ -6,7 +6,7 @@ from app import db, cache
 from app.api import api
 from app.api.auth import token_auth
 from app.api.user import user_config
-from app.utils import ExerciseBuild
+from app.utils import ExerciseBuild, get_gspeech
 from app.models import VocabType, UserData
 
 def allowed_file(filename):
@@ -28,12 +28,20 @@ def get_exercise():
     Exercise = ExerciseBuild(g.user.uid, **config)
     return jsonify(list(Exercise.auto_exercise(n)))
 
+@api.route('/resource/exercise/speech', methods=['GET'])
+@token_auth.login_required
+def get_speech():
+    data = request.get_json()
+    if not data:
+        return {'message': 'You must provide JSON data.'}, 400
+    return get_gspeech(data['text'])
+
 @api.route('/resource/exercise/status', methods=['PUT'])
 @token_auth.login_required
 def practice():
     data = request.get_json()
     if not data:
-        return {'message': 'You must post JSON data.'}, 400
+        return {'message': 'You must provide JSON data.'}, 400
 
     errors = {}
     if not 'word' in data or not data.get('word', None):
@@ -86,7 +94,7 @@ def put_vtype():
     data = request.get_json()
  
     if not data:
-        return {'message': 'You must post JSON data.'}, 400
+        return {'message': 'You must provide JSON data.'}, 400
 
     errors = []
     if not 'id' in data or not data.get('id', None):

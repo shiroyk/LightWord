@@ -28,12 +28,12 @@ def get_config():
 def put_config():
     configs = request.get_json()
     if not configs:
-        return {'message': 'You must post JSON data.'}, 400
+        return {'message': 'You must provide JSON data.'}, 400
 
     configlist = ['vtype','pronounce']
     notin = [ v for v in configs.keys() if v in configlist ]
     if len(notin) != len(configlist):
-        return {'message': 'Please post correct config.'}, 400
+        return {'message': 'Please provide correct config.'}, 400
 
     cache.delete('userconfig'+str(g.user.uid))
     try:
