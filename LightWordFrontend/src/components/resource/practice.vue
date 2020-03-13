@@ -114,6 +114,7 @@ export default {
     card: 0,
     currentCard: 0,
     status: "",
+    sentence: "",
     lsentence: "",
     rsentence: "",
     meaning: "",
@@ -169,6 +170,7 @@ export default {
       this.currentWord = data.example.word;
 
       this.inflection = data.inflection;
+      this.sentence = data.example.sentence
       this.lsentence = data.example.split[0];
       this.rsentence = data.example.split[1];
       this.translation = data.example.translation;
@@ -190,9 +192,23 @@ export default {
       }
     },
     playVoice() {
-      //暂未添加
       if (this.volume) {
-        return new Promise(resolve => setTimeout(resolve, 2000));
+        return new Promise((resolve, reject) => {
+          var audio = new Audio();
+          this.$axios
+          .post("/resource/exercise/speech", {
+            "text": this.sentence
+          })
+          .then(response => {
+            audio.autoplay = true;
+            audio.onerror = reject;
+            audio.onended = resolve;
+            audio.src = "data:audio/mp3;base64," + response.data;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        });
       } else {
         return new Promise(resolve => setTimeout(resolve, 1000));
       }
