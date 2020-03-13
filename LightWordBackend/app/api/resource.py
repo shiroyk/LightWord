@@ -28,7 +28,7 @@ def get_exercise():
     Exercise = ExerciseBuild(g.user.uid, **config)
     return jsonify(list(Exercise.auto_exercise(n)))
 
-@api.route('/resource/exercise/speech', methods=['GET'])
+@api.route('/resource/exercise/speech', methods=['POST'])
 @token_auth.login_required
 def get_speech():
     data = request.get_json()
