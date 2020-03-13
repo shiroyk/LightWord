@@ -2,9 +2,10 @@
 .git
 .vscode
 .pylintrc
-dev_env
+backend_env
 __pycache__
 idea
+cache/*
 static/*
 logs/*
 idea.py
