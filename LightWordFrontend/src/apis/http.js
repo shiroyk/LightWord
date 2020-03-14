@@ -3,7 +3,7 @@ import router from '@/router'
 import store from '@/store'
 
 if (process.env.NODE_ENV == 'development') {    
-  axios.defaults.baseURL = 'http://127.0.0.1';
+  axios.defaults.baseURL = 'http://127.0.0.1:5000';
 } else if (process.env.NODE_ENV == 'production') {    
   axios.defaults.baseURL = 'http://api.shiroyk.moe';
 }

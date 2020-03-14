@@ -22,6 +22,17 @@ export default {
     pieArray: [],
     correctArray: [],
     wrongArray: [],
+    noDataOption: {
+      title: {
+        text: "No Data",
+        textStyle: {
+          color: "#757575",
+          fontSize: 20
+        },
+        left: "center",
+        top: "center"
+      },
+    },
     pieOption: {
       //piechart
       title: {
@@ -107,18 +118,24 @@ export default {
         .get("/user/statistic?days=10", {})
         .then(response => {
           const data = response.data;
-          for (var i = 0, len = data.length; i < len; i++) {
-            let day = data[i].day;
-            this.dateArray.push(day);
-            this.pieArray.push({ value: data[i].count, name: day });
-            this.correctArray.push(data[i].correct);
-            this.wrongArray.push(data[i].wrong);
+          if (data.length != 0) {
+              for (var i = 0, len = data.length; i < len; i++) {
+              let day = data[i].day;
+              this.dateArray.push(day);
+              this.pieArray.push({ value: data[i].count, name: day });
+              this.correctArray.push(data[i].correct);
+              this.wrongArray.push(data[i].wrong);
+            }
+            this.pieOption.legend.data = this.dateArray;
+            this.pieOption.series[0].data = this.pieArray;
+            this.lineOption.xAxis.data = this.dateArray;
+            this.lineOption.series[0].data = this.correctArray;
+            this.lineOption.series[1].data = this.wrongArray;
+            
+          } else {
+            this.pieOption = this.noDataOption
+            this.lineOption = this.noDataOption
           }
-          this.pieOption.legend.data = this.dateArray;
-          this.pieOption.series[0].data = this.pieArray;
-          this.lineOption.xAxis.data = this.dateArray;
-          this.lineOption.series[0].data = this.correctArray;
-          this.lineOption.series[1].data = this.wrongArray;
           this.pieChart();
           this.lineChart();
         })
