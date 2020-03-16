@@ -303,6 +303,7 @@ class UserConfig(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey(User.uid, ondelete='CASCADE'), index=True)
+    target = Column(Integer, default=50)
     vtype = Column(Integer, default=1)
     pronounce = Column(Integer, default=1)
     timestamp = Column(String(128), default=UserData.forget_time)
@@ -327,6 +328,7 @@ class UserConfig(db.Model):
         return {
                 "timestamp": config.timestamp,
                 "pronounce": config.pronounce,
+                "target": config.target,
                 "vtype": config.vtype
                 }
   
