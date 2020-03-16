@@ -30,7 +30,7 @@ def put_config():
     if not configs:
         return {'message': 'You must provide JSON data.'}, 400
 
-    configlist = ['vtype','pronounce']
+    configlist = ['vtype','pronounce', 'target']
     notin = [ v for v in configs.keys() if v in configlist ]
     if len(notin) != len(configlist):
         return {'message': 'Please provide correct config.'}, 400
@@ -69,7 +69,7 @@ def get_user_statistic():
 def create_user():
     data = request.get_json()
     if not data:
-        return {'message': 'Please post correct config.'}, 400
+        return {'message': 'You must provide JSON data.'}, 400
 
     errors = []
     if not 'username' in data or not data.get('username', None).strip():
