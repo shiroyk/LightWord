@@ -29,6 +29,11 @@ def put_config():
     if len(notin) != len(configlist):
         return {'message': 'Please provide correct config.'}, 400
 
+    target = configs['target']
+    if not (target > 0 and target < 999):
+        return {'message': 'Target must to be integer between 1 and 999'}, 400
+    configs.update({'target': int(target)})
+    
     ConfigCache().remove()
     try:
         timestamp = configs['timestamp']
