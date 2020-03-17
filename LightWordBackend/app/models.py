@@ -206,8 +206,7 @@ class UserData(db.Model):
         else:
             dataobj = cls(**datadict)
             db.session.add(dataobj)
-            db.session.flush()
-        return dataobj.id is not None
+            return True
 
     @classmethod
     def forget(cls, wid: int, uid: int, tid: int):
@@ -248,7 +247,7 @@ class UserData(db.Model):
             dataobj.last_practice = INITIAL_DATE
             db.session.add(dataobj)
             db.session.flush()
-        return dataobj.id is not None
+            return True
 
     @classmethod
     def user_word(cls, uid: int, tid: int, n = 10):

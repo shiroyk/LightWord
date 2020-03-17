@@ -1,16 +1,10 @@
 import re
 from flask import jsonify, request, Response, abort, g, json
-from app import db, cache
+from app import db
+from app.utils import ConfigCache
 from app.api import api
 from app.api.auth import token_auth
 from app.models import User, UserData, UserConfig
-
-def user_config(uid):
-    user_config = cache.get('user'+str(uid))
-    if not user_config:
-        user_config = UserConfig.get_config(uid)
-        cache.set('userconfig'+str(uid), user_config, timeout=10800)
-    return user_config
 
 @api.route('/user/profile', methods=['GET'])
 @token_auth.login_required
@@ -20,7 +14,7 @@ def get_user():
 @api.route('/user/config', methods=['GET'])
 @token_auth.login_required
 def get_config():
-    config = user_config(g.user.uid)
+    config = ConfigCache().get()
     return jsonify(config)
 
 @api.route('/user/config', methods=['PUT'])
@@ -35,7 +29,7 @@ def put_config():
     if len(notin) != len(configlist):
         return {'message': 'Please provide correct config.'}, 400
 
-    cache.delete('userconfig'+str(g.user.uid))
+    ConfigCache().remove()
     try:
         timestamp = configs['timestamp']
         if timestamp:
@@ -47,13 +41,13 @@ def put_config():
     for key, value in configs.items():
         setattr(userconfig, key, value)
     db.session.commit()
-    return jsonify(user_config(g.user.uid))
+    return jsonify(ConfigCache().get())
 
 @api.route('/user/word', methods=['GET'])
 @token_auth.login_required
 def get_user_word():
     n = request.args.get('days', default = 20, type = int)
-    userconfig = user_config(g.user.uid)
+    userconfig = ConfigCache().get()
     wordlist = UserData.user_word(g.user.uid, userconfig['vtype'], n)
     return jsonify(list(wordlist))
 
@@ -61,7 +55,7 @@ def get_user_word():
 @token_auth.login_required
 def get_user_statistic():
     days = request.args.get('days', default = 7, type = int)
-    userconfig = user_config(g.user.uid)
+    userconfig = ConfigCache().get()
     dayscount = UserData.recent_days(g.user.uid, userconfig['vtype'], days)
     return jsonify(list(dayscount))
 

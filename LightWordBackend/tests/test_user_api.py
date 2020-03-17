@@ -97,6 +97,7 @@ class UserAPITestCase(unittest.TestCase):
                         "M10": 92160
                 },
                 "vtype": 1,
+                "target": 50,
                 "pronounce": 1
             },
             headers = headers)
