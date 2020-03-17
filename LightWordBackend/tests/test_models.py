@@ -53,7 +53,7 @@ class ResourceAPITestCase(unittest.TestCase):
         userdata = UserData.remember(1,1,1)
         self.assertEqual(userdata, True)
         userdata = UserData.remember(1,1,1)
-        self.assertEqual(userdata, True)
+        self.assertEqual(userdata, None)
         
         userdata = UserData.forget(1,1,1)
         self.assertEqual(userdata, True)
@@ -61,7 +61,7 @@ class ResourceAPITestCase(unittest.TestCase):
         self.assertEqual(userdata, None)
 
         userdata = UserData.remembered(1,1,1)
-        self.assertEqual(userdata, True)
+        self.assertEqual(userdata, None)
         userdata = UserData.remembered(2,1,1)
         self.assertEqual(userdata, True)
 

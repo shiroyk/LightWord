@@ -2,29 +2,23 @@ import os
 from flask import jsonify, g, request, abort, current_app
 from werkzeug.utils import secure_filename
 
-from app import db, cache
+from app import db
 from app.api import api
 from app.api.auth import token_auth
-from app.api.user import user_config
-from app.utils import ExerciseBuild, get_gspeech
+from app.utils import ExerciseBuild, get_gspeech, VocabTypeCache, ConfigCache, DailyStatisticCache
 from app.models import VocabType, UserData
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in current_app.config['ALLOWED_EXTENSIONS']
 
-def vocabtype():
-    vtype = cache.get('VocabType')
-    if not vtype:
-        vtype = [ obj.to_dict() for obj in VocabType.query.all() ]
-        cache.set('VocabType', vtype, timeout=43200)
-    return vtype
+vocabtype_cache = VocabTypeCache()
 
 @api.route('/resource/exercise', methods=['GET'])
 @token_auth.login_required
 def get_exercise():
     n = request.args.get('n', default = 10, type = int)
-    config = user_config(g.user.uid)
+    config = ConfigCache().get()
     Exercise = ExerciseBuild(g.user.uid, **config)
     return jsonify(list(Exercise.auto_exercise(n)))
 
@@ -59,21 +53,25 @@ def practice():
         'wid': data['word'],
         'tid': data['vtype']
     }
+    statistic = DailyStatisticCache()
     if data['status'] == 1:
-        sta = UserData.remember(**userdata)
+        if UserData.remember(**userdata):
+            statistic.increase(1)
     elif data['status'] == 2:
-        sta = UserData.forget(**userdata)
+        if UserData.forget(**userdata):
+            statistic.increase(2)
     elif data['status'] == 3:
-        sta = UserData.remembered(**userdata)
+        if UserData.remembered(**userdata):
+            statistic.increase(1)
     else:
         return {'message': 'Error status.'}, 400
     
-    return jsonify({'message': str(sta)})
+    return jsonify(statistic.get())
     
 @api.route('/resource/type', methods=['GET'])
 @token_auth.login_required
 def get_vtype():
-    return jsonify(vocabtype())
+    return jsonify(vocabtype_cache.get())
 
 @api.route('/resource/type', methods=['POST'])
 @token_auth.login_required
@@ -104,11 +102,11 @@ def put_vtype():
 
     if errors:
         return {'message': errors}, 400
-    cache.delete('VocabType')
+    vocabtype_cache.remove()
     vtype = VocabType.query.get(data['id'])
     if not vtype:
         return {'message': 'Error vocab name id.'}, 400
     vtype.alias = data['alias']
     db.session.commit()
-    return jsonify(vocabtype())
+    return jsonify(vocabtype_cache.get())
 

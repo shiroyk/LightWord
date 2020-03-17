@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_script import Manager,Shell
+from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_caching import Cache
 
@@ -11,7 +11,7 @@ cache = Cache()
 
 
 def create_app(config = None):
-    app = Flask('DailyWord')
+    app = Flask('LightWord')
     
     app.config.from_object(config)
     custom_header(app)

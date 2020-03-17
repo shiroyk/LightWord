@@ -116,20 +116,20 @@ class ResourceAPITestCase(unittest.TestCase):
         response3 = self.client.put(
             '/resource/exercise/status',
             json = {
-                "word": 1,
+                "word": 2,
                 "vtype": 1,
                 "status": 3
             },
             headers = headers)
         
         data = response1.get_data(as_text=True)
-        self.assertIn('True', data)
+        self.assertIn('added', data)
         self.assertEqual(response1.status_code, 200)
         data = response2.get_data(as_text=True)
-        self.assertIn('True', data)
+        self.assertIn('wrong', data)
         self.assertEqual(response2.status_code, 200)
         data = response3.get_data(as_text=True)
-        self.assertIn('True', data)
+        self.assertIn('added', data)
         self.assertEqual(response2.status_code, 200)
     
     def test_get_vtype(self):
