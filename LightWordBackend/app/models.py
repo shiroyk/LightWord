@@ -287,10 +287,10 @@ class UserData(db.Model):
 
     @classmethod
     def review_word(cls, uid: int, tid: int, n = 10):
-        #按last_practice排序查询需要复习的Word
+        #按timestamp排序查询需要最先复习的Word
         utcnow = datetime.utcnow()
         userword = cls.query.filter_by(user_id = uid, vtype_id = tid) \
-                      .order_by(cls.last_practice) \
+                      .order_by(cls.timestamp) \
                       .limit(n)
         available_list = [ obj for obj in userword if obj.timestamp <= utcnow ]
         if len(available_list) >= n:
