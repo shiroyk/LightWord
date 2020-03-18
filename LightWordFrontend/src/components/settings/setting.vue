@@ -13,7 +13,7 @@
           <v-card flat>
             <v-card-text>
               <v-form ref="form" v-model="valid" lazy-validation>
-                <v-row align="center" justify="center">
+                <v-row justify="center">
                   <v-col cols="10">
                     <v-autocomplete
                       v-model="t_v"

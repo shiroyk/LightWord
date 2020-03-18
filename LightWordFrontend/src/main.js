@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import vuetify from './plugins/vuetify';
-import store from './store'
+import App from '@/App.vue'
+import router from '@/router'
+import vuetify from '@/plugins/vuetify';
+import store from '@/store'
 import axios from '@/apis/http'
 import echarts from 'echarts/lib/echarts'
 import 'echarts/lib/chart/line'

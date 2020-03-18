@@ -170,7 +170,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .xsCharts {
   min-width: 100%;
   height: 400px;
