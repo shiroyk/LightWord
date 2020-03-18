@@ -23,12 +23,8 @@
             <div class="mx-auto">
               <p>是否已掌握该单词？</p>
               <div class="d-flex justify-space-between mx-auto" style="width:8rem">
-                <v-btn icon @click="overlay = !overlay;graspCard()">
-                  是
-                </v-btn>
-                <v-btn icon @click="overlay = !overlay">
-                  否
-                </v-btn>
+                <v-btn icon @click="overlay = !overlay;graspCard()">是</v-btn>
+                <v-btn icon @click="overlay = !overlay">否</v-btn>
               </div>
             </div>
           </v-overlay>
@@ -76,7 +72,7 @@
         </div>
         <div class="d-flex justify-space-between p-1">
           <span>{{meaning}}</span>
-          <v-btn height="25" width="25" icon @click="volume=!volume">
+          <v-btn height="25" width="25" icon @click="setVolume">
             <v-icon>{{volume ? "mdi-volume-high":"mdi-volume-off"}}</v-icon>
           </v-btn>
         </div>
@@ -98,13 +94,13 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   props: {
     source: String
   },
   data: () => ({
     overlay: false,
-    volume: true,
     showWord: false,
     correct: false,
     wrong: false,
@@ -129,6 +125,17 @@ export default {
     inputDisabled: false
   }),
   methods: {
+    getTarget() {
+      this.$axios
+        .get("/user/config", {})
+        .then(response => {
+          let target = response.data.target
+          this.$store.commit("setTarget", target);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     getResource() {
       this.isLoading = true;
       this.$axios
@@ -146,20 +153,21 @@ export default {
         });
     },
     putData(status) {
-      this.$axios
-        .put("/resource/exercise/status", {
-          word: this.wid,
-          vtype: this.tid,
-          status: status
-        })
-        .then(response => {
-          if (response.status == 200) {
-            console.log("Ok");
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      return new Promise((resolve, reject) => {
+        this.$axios
+          .put("/resource/exercise/status", {
+            word: this.wid,
+            vtype: this.tid,
+            status: status
+          })
+          .then(response => {
+            resolve(response.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          });
+      })
     },
     readData(data) {
       if (data.status == "Remember") {
@@ -170,7 +178,7 @@ export default {
       this.currentWord = data.example.word;
 
       this.inflection = data.inflection;
-      this.sentence = data.example.sentence
+      this.sentence = data.example.sentence;
       this.lsentence = data.example.split[0];
       this.rsentence = data.example.split[1];
       this.translation = data.example.translation;
@@ -196,18 +204,18 @@ export default {
         return new Promise((resolve, reject) => {
           var audio = new Audio();
           this.$axios
-          .post("/resource/exercise/speech", {
-            "text": this.sentence
-          })
-          .then(response => {
-            audio.autoplay = true;
-            audio.onerror = reject;
-            audio.onended = resolve;
-            audio.src = "data:audio/mp3;base64," + response.data;
-          })
-          .catch(error => {
-            console.log(error);
-          });
+            .post("/resource/exercise/speech", {
+              text: this.sentence
+            })
+            .then(response => {
+              audio.autoplay = true;
+              audio.onerror = reject;
+              audio.onended = resolve;
+              audio.src = "data:audio/mp3;base64," + response.data;
+            })
+            .catch(error => {
+              console.log(error);
+            });
         });
       } else {
         return new Promise(resolve => setTimeout(resolve, 1000));
@@ -221,7 +229,12 @@ export default {
           inputValue == this.currentWord.toLowerCase() ||
           this.inflection.includes(inputValue)
         ) {
-          this.putData(1);
+          this.putData(1)
+          .then(data => {
+            if (data.added == this.target) {
+              console.log('今日目标已完成');
+            }
+          });
           this.correct = true;
           this.$refs.inputword.value = this.currentWord;
           await this.playVoice();
@@ -268,11 +281,20 @@ export default {
       this.currentCard = this.card;
       this.readData(this.array[this.card]);
     },
+    setVolume() {
+      if (this.volume) {
+        this.$store.commit("setVolume", false);
+      } else {
+        this.$store.commit("setVolume", true);
+      }
+    }
   },
-  created: function() {
+  created() {
+    this.getTarget();
+  },
+  mounted() {
     this.getResource();
   },
-  mounted() {},
   computed: {
     textSize() {
       return function(value) {
@@ -282,7 +304,11 @@ export default {
           return 5 / String(value).length + 1.5 + "rem";
         }
       };
-    }
+    },
+    ...mapState({
+      volume: state => state.practice.volume,
+      target: state => state.practice.target
+    })
   }
 };
 </script>

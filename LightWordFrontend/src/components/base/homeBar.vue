@@ -44,24 +44,25 @@
             </v-btn>
           </v-card-title>
 
-          <v-tabs fixed-tabs color="primary">
-            <v-tab>Another</v-tab>
-
-            <v-tab-item
-              style="padding: 0 10px"
-              :transition="false"
-              :reverse-transition="false"
-            >
-              <v-data-table
-                :headers="headers"
-                :items="desserts"
-                item-key="name"
-                :loading="loading"
-                :mobile-breakpoint="NaN"
-                loading-text="Loading... Please wait"
-              ></v-data-table>
-            </v-tab-item>
-          </v-tabs>
+          <v-card-text>
+            <v-text-field
+              v-model="search"
+              clearable
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
+            <v-data-table
+              :headers="headers"
+              :items="desserts"
+              item-key="name"
+              :search="search"
+              :loading="loading"
+              :mobile-breakpoint="NaN"
+              loading-text="Loading... Please wait"
+            ></v-data-table>
+            
+          </v-card-text>
         </v-card>
       </v-dialog>
     </v-app-bar>
@@ -77,14 +78,13 @@ export default {
   data: () => ({
     statistics: false,
     drawer: null,
-    loading: true,
+    loading: false,
+    search: null,
     desserts: [],
-    labels: [],
-    value: [],
     headers: [
       { text: "Word", value: "word" },
-      { text: "Correct", value: "correct" },
-      { text: "Wrong", value: "wrong" }
+      { text: "Correct", value: "correct", filterable: false },
+      { text: "Wrong", value: "wrong", filterable: false }
     ],
     items: [
       {
@@ -116,40 +116,41 @@ export default {
   },
   methods: {
     getUserword() {
+      if (this.desserts.length > 0) return;
+
+      this.loading = true;
       this.$axios
-      .get("/user/word", {})
-      .then(response => {
-        if (this.desserts.length == 0) {
+        .get("/user/word", {})
+        .then(response => {
           this.desserts = response.data;
           this.loading = false;
-        }
-      })
-      .catch(error => {
-        console.log(error.data);
-      });
+        })
+        .catch(error => {
+          console.log(error.data);
+        });
     },
     setTheme() {
-      if (this.theme == 'dark') {
-        this.$vuetify.theme.dark = false
-        this.$store.commit('setTheme', 'light')
+      if (this.theme == "dark") {
+        this.$vuetify.theme.dark = false;
+        this.$store.commit("setTheme", "light");
       } else {
-        this.$vuetify.theme.dark = true
-        this.$store.commit('setTheme', 'dark')
+        this.$vuetify.theme.dark = true;
+        this.$store.commit("setTheme", "dark");
       }
     },
     readTheme() {
-      if (this.theme == 'dark') {
-        this.$vuetify.theme.dark = true
+      if (this.theme == "dark") {
+        this.$vuetify.theme.dark = true;
       } else {
-        this.$vuetify.theme.dark = false
+        this.$vuetify.theme.dark = false;
       }
     }
   },
   created() {
-    this.readTheme()
+    this.readTheme();
   },
   mounted() {
-    this.getUserword()
+    this.getUserword();
   }
 };
 </script>

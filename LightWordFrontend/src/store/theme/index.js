@@ -6,7 +6,7 @@ const themeStore = {
   getters: {},
   mutations: {
     setTheme(state, name) {
-        sessionStorage.setItem('theme', name)
+      sessionStorage.setItem('theme', name);
       state.theme = name;
     }
   },
