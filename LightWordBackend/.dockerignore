@@ -1,0 +1,10 @@
+.git
+.vscode
+.pylintrc
+backend_env
+__pycache__
+idea
+static/*
+logs/*
+idea.py
+tmp
