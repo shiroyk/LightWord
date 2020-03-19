@@ -1,4 +1,0 @@
-[submodule "LightWordFrontend"]
-	path = LightWordFrontend
-	url = https://github.com/shiroyk/LightWordFrontend.git
-	branch = master
