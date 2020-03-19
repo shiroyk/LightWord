@@ -9,7 +9,7 @@ services:
         volumes:
             - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
             - ./nginx/conf/conf.d:/etc/nginx/conf.d
-            - ./LightWordFrontend/dist:/usr/share/nginx/html
+            - ./Frontend/dist:/usr/share/nginx/html
             - ./nginx/logs:/var/logs/nginx
         networks:
             - api_net
@@ -35,7 +35,7 @@ services:
             - 127.0.0.1:3306:3306
     backend:
         build:
-            context: ./LightWordBackend
+            context: ./BackendFlask
             dockerfile: Dockerfile
         image: backend:latest
         restart: always
@@ -44,7 +44,7 @@ services:
             - db
             - redis
         volumes:
-            - ./LightWordBackend:/home/app/
+            - ./BackendFlask:/home/app/
         networks:
             - db_net
             - api_net

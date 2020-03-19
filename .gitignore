@@ -1,7 +1,26 @@
 .DS_Store
-dev_env/
-__pycache__/
-.vscode/
+.vscode
+
+# BackendFlask
+/BackendFlask/*_env/
+__pycache__
+/BackendFlask/logs/*
+/BackendFlask/static/*
+/BackendFlask/cache/*
+/BackendFlask/idea
+/BackendFlask/idea.py
+/BackendFlask/.pylintrc
+
+# Frontend
+/Frontend/node_modules
+/Frontend/dist
+/Frontend/.env.local
+/Frontend/.env.*.local
+/Frontend/npm-debug.log*
+/Frontend/yarn-debug.log*
+/Frontend/yarn-error.log*
+
+tmp/
 logs/*
 /test/
 /db/data/*

@@ -9,7 +9,7 @@ jobs:
             directories:
                 - node_modules
         before_install:
-            - cd LightWordFrontend
+            - cd Frontend
         install:
             - npm install
         script:
@@ -24,11 +24,11 @@ jobs:
         addons:
             hosts:
               - api.shiroyk.moe
-              - shiroyk.moe
+              - www.shiroyk.moe
         branches:
             only:
                 - master
         script:
             - docker-compose up -d
         after_script:
-            - curl -H "Content-Type:application/json" -X POST -d '{"test"}' http://api.shiroyk.moe/token
+            - while [[ "$(curl -X POST -s -o /dev/null -w ''%{http_code}'' 'http://api.shiroyk.moe/token')" != "401" ]]; do sleep 5; done && echo "Backend Ok"
