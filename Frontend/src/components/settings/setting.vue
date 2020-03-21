@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <v-card class="account mx-auto" :loading="isLoading">
-      <v-tabs centered :vertical="$vuetify.breakpoint.smAndUp" class="tab-start">
+      <v-tabs :centered="$vuetify.breakpoint.xs" :vertical="$vuetify.breakpoint.smAndUp" class="tab-start">
         <v-tab>
-          <v-icon left>mdi-settings</v-icon>setting
+          <v-icon left>mdi-cog</v-icon>setting
         </v-tab>
         <v-tab>
           <v-icon left>mdi-account</v-icon>account

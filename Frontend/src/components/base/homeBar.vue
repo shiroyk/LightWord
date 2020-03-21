@@ -3,8 +3,9 @@
     <v-navigation-drawer
       width="200"
       v-model="drawer"
-      :expand-on-hover="$vuetify.breakpoint.lgAndUp"
-      :clipped="$vuetify.breakpoint.lgAndUp"
+      mobile-break-point="600"
+      :mini-variant="$vuetify.breakpoint.smAndUp"
+      :clipped="$vuetify.breakpoint.smAndUp"
       app
     >
       <v-list>
@@ -26,7 +27,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app dark color="primary">
+    <v-app-bar :clipped-left="$vuetify.breakpoint.smAndUp" app dark color="primary">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title class="ml-0 pl-4">
         <span>{{$route.meta.title}}</span>
@@ -98,7 +99,7 @@ export default {
         router: "/practice"
       },
       {
-        icon: "mdi-settings",
+        icon: "mdi-cog",
         text: "Setting",
         router: "/setting"
       },
