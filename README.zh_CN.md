@@ -7,8 +7,8 @@
 ## 使用方式
 
 ```
-git clone --recurse-submodules https://github.com/shiroyk/LightWord.git
-cd LightWordFrontend && npm install && npm run build && cd ..
+git clone https://github.com/shiroyk/LightWord.git
+cd Frontend && npm install && npm run build && cd ..
 docker-compose up -d
 ```
 
