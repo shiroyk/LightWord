@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState } from "vuex";
 export default {
   data: () => ({
     valid: true,
@@ -54,11 +54,21 @@ export default {
   },
   methods: {
     login() {
-      let username = this.username 
-      let password = this.password
-      this.$store.dispatch('login', { username, password })
-      .then(() => { this.$router.push('/home') })
-      .catch(error => { console.log(error) })
+      let username = this.username;
+      let password = this.password;
+      this.$store
+        .dispatch("login", { username, password })
+        .then(() => {
+          this.$dialog("Login successful...", {
+            color: "success",
+            showClose: false,
+            progress: "linear",
+            push: "/home"
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     clearMessages() {
       this.$store.commit("loginMessage", []);

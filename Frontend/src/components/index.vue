@@ -1,6 +1,6 @@
 <template>
   <div class="bg" :style="bgimg">
-    <v-row align="content-space-around" justify="center" style="height:90%" no-gutters>
+    <v-row justify="center" style="height:90%" no-gutters>
       <v-col class="text-center" cols="12">
         <h1 style="color:rgb(255, 255, 255, 0.7)">
           Light

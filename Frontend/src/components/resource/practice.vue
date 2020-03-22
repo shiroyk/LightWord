@@ -129,7 +129,7 @@ export default {
       this.$axios
         .get("/user/config", {})
         .then(response => {
-          let target = response.data.target
+          let target = response.data.target;
           this.$store.commit("setTarget", target);
         })
         .catch(error => {
@@ -161,13 +161,13 @@ export default {
             status: status
           })
           .then(response => {
-            resolve(response.data)
+            resolve(response.data);
           })
           .catch(error => {
             console.log(error);
-            reject(error)
+            reject(error);
           });
-      })
+      });
     },
     readData(data) {
       if (data.status == "Remember") {
@@ -229,10 +229,13 @@ export default {
           inputValue == this.currentWord.toLowerCase() ||
           this.inflection.includes(inputValue)
         ) {
-          this.putData(1)
-          .then(data => {
-            if (data.added == this.target) {
-              console.log('今日目标已完成');
+          this.putData(1).then(data => {
+            if (data.added == 2) {
+              this.$dialog("Message", {
+                message: "今日目标已完成",
+                color: "primary",
+                timeout: 0
+              });
             }
           });
           this.correct = true;
