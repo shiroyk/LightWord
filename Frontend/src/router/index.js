@@ -60,6 +60,10 @@ const router = new VueRouter({
         requireAuth: true,
         color: '#1565C0'
       }
+    },
+    {
+      path: '*',
+      redirect: '/'
     }
   ]
 })
@@ -75,9 +79,14 @@ router.beforeEach((to, from, next) => {
     const token = store.state.auth.token
     if (token) {
       store.dispatch("inspectToken", token)
-      .then(() => next())
-      .catch(() => router.replace({ path: '/' }))
-      console.log('检查token')
+        .then(() => next())
+        .catch(() => (
+          Vue.prototype.$dialog("登录信息已失效...", {
+            color: "error",
+            showClose: false,
+            progress: "linear",
+            push: "/"
+          })))
     } else {
       console.log('未检测到token')
       router.replace({ path: '/' })

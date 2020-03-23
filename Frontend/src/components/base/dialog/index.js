@@ -6,34 +6,32 @@ function initDialog(Vue, options = {}) {
 
   const Dialogs = Vue.extend(Object.assign({ vuetify, router }, dialog))
   function createDialogCmp(options) {
-    const app = document.createElement('div')
-    let vm = new Dialogs({ el: document.createElement('div') });
+    const container = document.createElement('div')
+    let vm = new Dialogs();
     options.messageDialog = true
     Object.assign(vm, options);
-    return new Promise(resolve => {
-      vm.$on('dialog', (status) => {
-        if (!status) {
-          vm.$nextTick(() => {
-            vm.$destroy()
-            app.removeChild(vm.$el)
-          })
-        }
-        resolve(app.appendChild(vm.$mount().$el))
-        if (options.push) {
-          router.push(options.push)
-        }
-      })
-    })
+    container.appendChild(vm.$mount().$el)
+    
+    return vm
   }
 
   function show(title, options = {}) {
     options.title = title
-    return createDialogCmp(options)
+    const vm = createDialogCmp(options)
+    vm.$on('dialog', (status) => {
+      if (!status) {
+        vm.$nextTick(() => {
+          vm.$destroy()
+        })
+      }
+      if (options.push) {
+        router.push(options.push)
+      }
+    })
   }
 
-  Vue.prototype.$dialog = show
-  Vue.prototype.$dialog.options = options || {}
-}
+  Vue.prototype.$dialog = Object.assign(show, { options })
 
+}
 
 export default initDialog

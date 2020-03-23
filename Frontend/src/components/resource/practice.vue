@@ -230,9 +230,9 @@ export default {
           this.inflection.includes(inputValue)
         ) {
           this.putData(1).then(data => {
-            if (data.added == 2) {
+            if (data.added == this.target) {
               this.$dialog("Message", {
-                message: "今日目标已完成",
+                message: "<p class='text-center'>今日目标已完成</p>",
                 color: "primary",
                 timeout: 0
               });
