@@ -13,12 +13,13 @@ class ExerciseBuild(object):
         try:
             self.tid = config['vtype']
             self.pron = config['pronounce']
+            self.order = config['order']
             UserData.forget_time = json.loads(config['timestamp'])
         except (ValueError,KeyError):
             current_app.logger.error('%s: Please check user %s config', __name__, self.uid)
     
     def _random_example(self, define):
-        randomex = random.sample(define, 1)[0]
+        randomex = random.sample(define['collocation'], 1)[0]
         randomex.update({'examplelist': random.sample(randomex['examplelist'], 1)})
         return randomex
     
@@ -59,18 +60,19 @@ class ExerciseBuild(object):
             self.word = obj.vocabulary.word
             word_id = obj.vocabulary.id
             word_define = json.loads(obj.vocabulary.localdict)
-            random_define = self._random_example(word_define)
 
+            pronounce = self._pronounce_init(word_define['pronounce'])
+            inflection = word_define['inflection']
+
+            random_define = self._random_example(word_define)
             meaning = random_define['meaning']
-            pronounce = self._pronounce_init(random_define['pronounce'])
+            
             try:
                 part_of_speech = random_define['part of speech']
             except (ValueError, KeyError):
                 part_of_speech = None
                 current_app.logger.warn('%s: %s of type id %s don\'t have part of speech', __name__, self.word, self.tid )
                 continue
-            
-            inflection = random_define['inflection']
 
             examplelist = random_define['examplelist'][0]
             example = examplelist['example']
@@ -101,13 +103,13 @@ class ExerciseBuild(object):
                         },
                 }
 
+    def new_exercise(self, num = 10):
+        return list(self._build_dict(VocabData.new_word(self.uid, self.tid, num, self.order), 'Remember'))
+
     def auto_exercise(self, num = 10):
         review_word = UserData.review_word(self.uid, self.tid, num)
         if review_word:
             return list(self._build_dict(review_word, 'Review'))
         else:
-            return list(self._build_dict(VocabData.new_word(self.uid, self.tid, num), 'Remember'))
-
-    def new_exercise(self, num = 10):
-        return list(self._build_dict(VocabData.new_word(self.uid, self.tid, num), 'Remember'))
+            return self.new_exercise(num)
 

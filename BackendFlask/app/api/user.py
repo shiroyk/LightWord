@@ -24,7 +24,7 @@ def put_config():
     if not configs:
         return {'message': 'You must provide JSON data.'}, 400
 
-    configlist = ['vtype','pronounce', 'target']
+    configlist = ['vtype','pronounce', 'target', 'order']
     notin = [ v for v in configs.keys() if v in configlist ]
     if len(notin) != len(configlist):
         return {'message': 'Please provide correct config.'}, 400

@@ -67,7 +67,7 @@ class ResourceAPITestCase(unittest.TestCase):
 
         response = self.client.get('/resource/exercise', headers = headers)
         data = response.get_data(as_text=True)
-        self.assertIn('meaning', data)
+        self.assertIn('abandon', data)
         self.assertEqual(response.status_code, 200)
 
     def test_exercise_status(self):

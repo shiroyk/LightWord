@@ -98,6 +98,7 @@ class UserAPITestCase(unittest.TestCase):
                 },
                 "vtype": 1,
                 "target": 50,
+                "order": 1,
                 "pronounce": 1
             },
             headers = headers)

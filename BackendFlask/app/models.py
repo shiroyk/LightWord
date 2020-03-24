@@ -18,6 +18,7 @@ class Vocabulary(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     word = Column(String(64), nullable=False, index=True)
+    frequency = Column(Integer, default=99999, nullable=False)
     localdict = Column(Text(), nullable=False)
 
 class VocabType(db.Model):
@@ -55,6 +56,7 @@ class VocabData(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     word_id = Column(Integer, ForeignKey(Vocabulary.id, ondelete='CASCADE'), nullable=False, index=True)
     vtype_id = Column(Integer, ForeignKey(VocabType.id, ondelete='CASCADE'), nullable=False, index=True)
+    frequency = Column(Integer, default=99999, nullable=False)
     total_correct = Column(Integer, default=0, nullable=False)
     total_error = Column(Integer, default=0, nullable=False)
     
@@ -77,9 +79,13 @@ class VocabData(db.Model):
         db.session.add(self)
 
     @classmethod
-    def new_word(cls, uid: int, tid: int, n = 5):
+    def new_word(cls, uid: int, tid: int, n = 5, order = 0):
         #连表子查询User表不存在的Word
-        rand = func.rand() if db.session.bind.dialect.name == 'mysql' else func.random()
+        if order == 1:
+            rand = cls.frequency
+        else:
+            rand = func.rand() if db.session.bind.dialect.name == 'mysql' else func.random()
+
         userword =  UserData \
                     .query \
                     .options(load_only(UserData.word_id)) \
@@ -304,6 +310,7 @@ class UserConfig(db.Model):
     user_id = Column(Integer, ForeignKey(User.uid, ondelete='CASCADE'), index=True)
     target = Column(Integer, default=50)
     vtype = Column(Integer, default=1)
+    order = Column(Integer, default=1) # 0 by random, 1 by frequency
     pronounce = Column(Integer, default=1)
     timestamp = Column(String(128), default=UserData.forget_time)
 
@@ -328,6 +335,7 @@ class UserConfig(db.Model):
                 "timestamp": config.timestamp,
                 "pronounce": config.pronounce,
                 "target": config.target,
-                "vtype": config.vtype
+                "vtype": config.vtype,
+                "order": config.order
                 }
   

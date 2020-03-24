@@ -34,11 +34,11 @@ class ResourceAPITestCase(unittest.TestCase):
 
         with open(path,'rb') as f:
             for line in f:
-                v = line.decode().split(',', 1)
-                vocab = Vocabulary(word= v[0], localdict = v[1])
+                v = line.decode().split(',', 2)
+                vocab = Vocabulary(word= v[0], frequency = v[1], localdict = v[2])
                 db.session.add(vocab)
                 db.session.flush()
-                vdata = VocabData(word_id = vocab.id, vtype_id = vtype)
+                vdata = VocabData(word_id = vocab.id, vtype_id = vtype, frequency = vocab.frequency)
                 db.session.add(vdata)
 
     def test_user(self):
