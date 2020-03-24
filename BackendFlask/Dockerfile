@@ -1,6 +1,7 @@
 FROM python:3.7-alpine
 
 ENV APPDIR=/home/app
+ENV FLASK_APP=$APPDIR/lightword.py
 COPY . $APPDIR
 
 RUN apk --no-cache add build-base python-dev py-gevent sox netcat-openbsd && \
