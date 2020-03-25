@@ -16,7 +16,7 @@
                 <v-row justify="center">
                   <v-col cols="10">
                     <v-autocomplete
-                      v-model="t_v"
+                      v-model="typesV"
                       :items="types"
                       hide-no-data
                       hide-details
@@ -27,12 +27,22 @@
                   </v-col>
                   <v-col cols="10">
                     <v-autocomplete
-                      v-model="p_v"
+                      v-model="pronounceV"
                       :items="pronounce"
                       hide-details
                       dense
                       outlined
                       label="Pronounce"
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col cols="10">
+                    <v-autocomplete
+                      v-model="orderV"
+                      :items="order"
+                      hide-details
+                      dense
+                      outlined
+                      label="Order"
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="10">
@@ -84,9 +94,11 @@ export default {
     valid: true,
     types: [],
     typesDict: {},
-    t_v: null,
-    p_v: null,
+    typesV: null,
+    pronounceV: null,
+    orderV: null,
     target: 0,
+    order: ["Random","Frequency"],
     isLoading: false,
     pronounce: ["Birtish", "Ameracian"],
     numRules: [
@@ -106,24 +118,26 @@ export default {
           this.$axios.get("/user/config")
         ])
         .then(([vtypes, config]) => {
-          var t = vtypes.data;
-          var c = config.data;
+          let t = vtypes.data;
+          let c = config.data;
           for (var i = 0, len = t.length; i < len; i++) {
             let amount = t[i].amount;
             let vocabtype = t[i].vocabtype + "(" + amount + ")";
             this.typesDict[vocabtype] = t[i].id;
             this.types.push(vocabtype);
           }
-          this.target = config.data.target;
-          this.t_v = this.types[c.vtype - 1];
-          this.p_v = this.pronounce[c.pronounce];
+          this.target = c.target;
+          this.orderV = this.order[c.order];
+          this.typesV = this.types[c.vtype - 1];
+          this.pronounceV = this.pronounce[c.pronounce];
         });
     },
     putConfig() {
       let putData = {
-        vtype: this.typesDict[this.t_v],
-        pronounce: this.pronounce.indexOf(this.p_v),
-        target: this.target
+        vtype: this.typesDict[this.typesV],
+        pronounce: this.pronounce.indexOf(this.pronounceV),
+        target: this.target,
+        order: this.order.indexOf(this.orderV)
       };
       this.$axios
         .put("/user/config", putData)
