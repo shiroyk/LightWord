@@ -82,9 +82,9 @@ class VocabData(db.Model):
     def new_word(cls, uid: int, tid: int, n = 5, order = 0):
         #连表子查询User表不存在的Word
         if order == 1:
-            rand = cls.frequency
+            orderby = cls.frequency
         else:
-            rand = func.rand() if db.session.bind.dialect.name == 'mysql' else func.random()
+            orderby = func.rand() if db.session.bind.dialect.name == 'mysql' else func.random()
 
         userword =  UserData \
                     .query \
@@ -96,7 +96,7 @@ class VocabData(db.Model):
                 .options(load_only(cls.word_id)) \
                 .outerjoin(userword, cls.word_id == userword.c.word_id) \
                 .filter(userword.c.word_id == None, cls.vtype_id == tid) \
-                .order_by(rand) \
+                .order_by(orderby) \
                 .limit(n)
 
 class User(db.Model):
