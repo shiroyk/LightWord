@@ -8,8 +8,14 @@ while ! nc -z redis 6379; do sleep 3; done
 
 echo "App can connect redis!"
 
-sleep 1 && echo "Run migrations"
+sleep 1 && echo "Run init db." && flask initdb
 
-/usr/local/bin/flask db upgrade head
+if [ $? == 0 ]; then
+    flask vocabulary --path resources/vocabulary.csv && flask vocabdata --path resources/GRE_Abridged.txt || echo "Database initialization failed!!!"
+else
+    echo "Database doesn't need to be initialized."
+fi
 
-/usr/local/bin/gunicorn -c config/gunicorn.py lightword:app --log-config config/logging.conf
+echo "Run migrations." && flask db upgrade || echo "Upgrade db failed."
+
+gunicorn -c config/gunicorn.py lightword:app --log-config config/logging.conf

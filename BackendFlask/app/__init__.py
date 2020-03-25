@@ -1,14 +1,11 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate
 from flask_caching import Cache
-
 
 db = SQLAlchemy()
 cache = Cache()
-
 
 def create_app(config = None):
     app = Flask('LightWord')
@@ -16,9 +13,8 @@ def create_app(config = None):
     app.config.from_object(config)
     custom_header(app)
 
-    manager = Manager(app)
     migrate = Migrate(app, db)
-    manager.add_command("db", MigrateCommand)
+    migrate.init_app(app)
 
     cors = CORS(app, resources={r"/*": {"origins": "*"}})
 

@@ -15,6 +15,7 @@ INITIAL_DATE = datetime(1970, 1, 1, 1, 1, 1)
 class Vocabulary(db.Model):
 
     __tablename__ = 'vocabulary'
+    __table_args__ = (db.UniqueConstraint('word', name='uix_word'), )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     word = Column(String(64), nullable=False, index=True)

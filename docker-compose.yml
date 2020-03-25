@@ -24,11 +24,11 @@ services:
             MYSQL_DATABASE: webdb
             MYSQL_USER: web
             MYSQL_PASSWORD: 123456
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         volumes:
             - ./db/conf:/etc/mysql/conf.d
             - ./db/data:/var/lib/mysql
             - ./db/logs:/var/log/mysql
-            - ./db/webdb.sql:/docker-entrypoint-initdb.d/webdb.sql
         networks:
             - db_net
         ports:
