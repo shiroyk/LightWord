@@ -13,10 +13,10 @@
           <v-btn icon height="25" width="25" @click="overlay = !overlay">
             <v-progress-circular
               :indeterminate="isLoading"
-              :value="(currentCard+1)*10"
+              :value="(card + 1) / cardArray.length * 100"
               size="25"
               width="5"
-              :color="status ? 'green accent-4' : 'yellow accent-4'"
+              :color="cardData.status == 'Remember' ? 'green accent-4' : 'yellow accent-4'"
             ></v-progress-circular>
           </v-btn>
           <v-overlay absolute :value="overlay" opacity="0.6">
@@ -29,24 +29,24 @@
             </div>
           </v-overlay>
 
-          <span>{{additional}}</span>
+          <span>{{cardData.additional}}</span>
         </div>
         <div
           class="d-flex flex-column flex-auto"
-          :style="{'font-size': textSize(lsentence+rsentence)}"
+          :style="{'font-size': 5 / String(cardData.example.sentence).length + 1.5 + 'rem'}"
           :class="{'card-body-xs': $vuetify.breakpoint.xs, 'card-body': $vuetify.breakpoint.smAndUp}"
         >
           <div class="flex-auto">
-            <span>{{lsentence}}</span>
+            <span>{{cardData.example.split[0]}}</span>
             <span
               class="input-container"
               :class="{'input-container-correct': correct, 'input-container-wrong': wrong}"
             >
               <transition name="fade">
-                <span v-if="showWord" class="fade current-word">{{currentWord}}</span>
+                <span v-if="showWord" class="fade current-word">{{cardData.word}}</span>
               </transition>
               <span class="hidden-word">
-                <span v-for="(w,i) in currentWord" :key="i">{{w}}</span>
+                <span v-for="(w,i) in cardData.word" :key="i">{{w}}</span>
               </span>
               <input
                 ref="inputword"
@@ -66,12 +66,12 @@
                 @keyup.enter="nextCard"
               />
             </span>
-            <span>{{rsentence}}</span>
+            <span>{{cardData.example.split[1]}}</span>
           </div>
-          <p class="sentence-translation">{{translation}}</p>
+          <p class="sentence-translation">{{cardData.example.translation}}</p>
         </div>
         <div class="d-flex justify-space-between p-1">
-          <span>{{meaning}}</span>
+          <span>{{cardData.meaning}}</span>
           <v-btn height="25" width="25" icon @click="setVolume">
             <v-icon>{{volume ? "mdi-volume-high":"mdi-volume-off"}}</v-icon>
           </v-btn>
@@ -104,21 +104,26 @@ export default {
     showWord: false,
     correct: false,
     wrong: false,
-    array: [],
-    wid: 0,
-    tid: 0,
+    cardArray: [],
+    targetDialog: true,
     card: 0,
     currentCard: 0,
-    status: "",
-    sentence: "",
-    lsentence: "",
-    rsentence: "",
-    meaning: "",
-    inflection: "",
-    additional: "",
-    pronounce: "",
-    currentWord: "",
-    translation: "",
+    cardData: {
+        "additional": "",
+        "example": {
+            "sentence": "",
+            "split": ["", ""],
+            "translation": "",
+            "word": ""
+        },
+        "id": 0,
+        "inflection": [],
+        "meaning": "",
+        "pronounce": "",
+        "status": "",
+        "vtype": 0,
+        "word": ""
+    },
     rightbtn: true,
     leftbtn: true,
     isLoading: false,
@@ -126,6 +131,8 @@ export default {
   }),
   methods: {
     getTarget() {
+      if (this.target.length > 0) return;
+
       this.$axios
         .get("/user/config", {})
         .then(response => {
@@ -141,62 +148,44 @@ export default {
       this.$axios
         .get("/resource/exercise", {})
         .then(response => {
-          this.array = response.data;
-          this.readData(this.array[this.card]);
+          this.cardArray = response.data;
+          this.cardData = this.cardArray[this.currentCard];
           this.isLoading = false;
           this.$nextTick(() => {
             this.$refs.inputword.focus();
-          });
+          })
         })
         .catch(error => {
           console.log(error);
         });
     },
     putData(status) {
-      return new Promise((resolve, reject) => {
-        this.$axios
-          .put("/resource/exercise/status", {
-            word: this.wid,
-            vtype: this.tid,
-            status: status
-          })
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            console.log(error);
-            reject(error);
-          });
-      });
-    },
-    readData(data) {
-      if (data.status == "Remember") {
-        this.status = true;
-      } else {
-        this.status = false;
-      }
-      this.currentWord = data.example.word;
-
-      this.inflection = data.inflection;
-      this.sentence = data.example.sentence;
-      this.lsentence = data.example.split[0];
-      this.rsentence = data.example.split[1];
-      this.translation = data.example.translation;
-      this.meaning = data.meaning;
-      this.pronounce = data.pronounce;
-      this.additional = data.additional;
-      this.wid = data.id;
-      this.tid = data.vtype;
+      this.$axios
+        .put("/resource/exercise/status", {
+          word: this.cardData.id,
+          vtype: this.cardData.vtype,
+          status: status
+        })
+        .then(response => {
+          if (response.data.added == this.target && this.targetDialog) {
+            this.targetDialog = false
+            this.$dialog("Message", {
+              message: "<p class='text-center'>今日目标已完成</p>",
+              color: "primary",
+              timeout: 0
+            });
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     prevCard() {
       if (this.card > 0) {
         this.card -= 1;
-        this.readData(this.array[this.card]);
-        this.$refs.inputword.value = this.currentWord;
+        this.cardData = this.cardArray[this.card];
+        this.$refs.inputword.value = this.cardData.word;
         this.inputDisabled = true;
-        if (this.card == 0) {
-          this.leftbtn = true;
-        }
       }
     },
     playVoice() {
@@ -205,7 +194,7 @@ export default {
           var audio = new Audio();
           this.$axios
             .post("/resource/exercise/speech", {
-              text: this.sentence
+              text: this.cardData.example.sentence
             })
             .then(response => {
               audio.autoplay = true;
@@ -226,34 +215,29 @@ export default {
         this.inputDisabled = false;
         let inputValue = this.$refs.inputword.value.toLowerCase();
         if (
-          inputValue == this.currentWord.toLowerCase() ||
-          this.inflection.includes(inputValue)
+          inputValue == this.cardData.word.toLowerCase() ||
+          this.cardData.inflection.includes(inputValue)
         ) {
-          this.putData(1).then(data => {
-            if (data.added == this.target) {
-              this.$dialog("Message", {
-                message: "<p class='text-center'>今日目标已完成</p>",
-                color: "primary",
-                timeout: 0
-              });
-            }
-          });
+          // 如果结果正确
+          this.putData(1)
           this.correct = true;
-          this.$refs.inputword.value = this.currentWord;
+          this.$refs.inputword.value = this.cardData.word;
           await this.playVoice();
           this.correct = false;
 
-          if (this.card < 9) {
-            this.card += 1;
+          this.card += 1;
+          this.$refs.inputword.value = ""; 
+          if (this.card < this.cardArray.length) {
             this.currentCard = this.card;
-            this.readData(this.array[this.card]);
-            this.$refs.inputword.value = "";
+            this.cardData = this.cardArray[this.card];
           } else {
             this.card = 0;
             this.currentCard = 0;
             this.getResource();
           }
+          
         } else {
+          // 如果结果错误
           this.wrong = true;
           this.putData(2);
           this.$refs.inputword.value = "";
@@ -265,24 +249,21 @@ export default {
         }
       } else {
         this.card += 1;
-        this.readData(this.array[this.card]);
+        this.cardData = this.cardArray[this.card];
         if (this.currentCard > this.card) {
-          this.$refs.inputword.value = this.currentWord;
+          this.$refs.inputword.value = this.cardData.word;
           this.inputDisabled = true;
         } else {
           this.inputDisabled = false;
           this.$refs.inputword.value = "";
         }
       }
-      if (this.currentCard > 0) {
-        this.leftbtn = false;
-      }
     },
     graspCard() {
       this.putData(3);
       this.card += 1;
       this.currentCard = this.card;
-      this.readData(this.array[this.card]);
+      this.cardData = this.cardArray[this.card];
     },
     setVolume() {
       if (this.volume) {
@@ -293,21 +274,21 @@ export default {
     }
   },
   created() {
-    this.getTarget();
+    this.getResource();    
   },
   mounted() {
-    this.getResource();
+    this.getTarget();
+  },
+  watch: {
+    card(val) {
+      if (val > 0) {
+        this.leftbtn = false;
+      } else {
+        this.leftbtn = true;
+      }
+    }
   },
   computed: {
-    textSize() {
-      return function(value) {
-        if (value == "") {
-          return "100%";
-        } else {
-          return 5 / String(value).length + 1.5 + "rem";
-        }
-      };
-    },
     ...mapState({
       volume: state => state.practice.volume,
       target: state => state.practice.target

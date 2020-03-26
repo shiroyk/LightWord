@@ -42,7 +42,7 @@
                       hide-details
                       dense
                       outlined
-                      label="Order"
+                      label="Order by"
                     ></v-autocomplete>
                   </v-col>
                   <v-col cols="10">
