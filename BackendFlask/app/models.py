@@ -184,15 +184,14 @@ class UserData(db.Model):
         "M5": 2880, "M6": 5760, "M7": 10080, 
         "M8": 14436, "M9": 46080, "M10": 92160 }
 
-    @property
-    def _caldate(self):
+    def _caldate(self, minus = False):
         stage = len(self.forget_time)
         now = datetime.utcnow()
         datelist = [ obj for obj in self.forget_time.items() ]
         if self.stage < stage:
             #计算UTC时间+/-天数(分钟换算)
-            self.timestamp = now + timedelta(minutes=datelist[self.stage][1])
-            # self.timestamp = now + timedelta(minutes=datelist[self.stage - 2][1])
+            minus_stage = 2 if minus and self.stage > 1 else 0
+            self.timestamp = now + timedelta(minutes=datelist[self.stage - minus_stage][1])
         return self.timestamp
 
     @classmethod
@@ -205,7 +204,7 @@ class UserData(db.Model):
         dataobj = cls.query.filter_by(**datadict).first()
         if dataobj:
             if dataobj.stage < len(cls.forget_time):
-                dataobj.timestamp = dataobj._caldate
+                dataobj.timestamp = dataobj._caldate()
                 dataobj.stage += 1
             dataobj.last_practice = datetime.utcnow()
             dataobj.correct += 1
@@ -213,7 +212,7 @@ class UserData(db.Model):
         else:
             dataobj = cls(**datadict)
             db.session.add(dataobj)
-            return True
+            return dataobj.id is not None
 
     @classmethod
     def forget(cls, wid: int, uid: int, tid: int):
@@ -225,6 +224,7 @@ class UserData(db.Model):
         dataobj = cls.query.filter_by(**datadict).first()
         if dataobj:
             if dataobj.stage > 1:
+                dataobj.timestamp = dataobj._caldate(True)
                 dataobj.stage -= 1
             dataobj.last_practice = datetime.utcnow()
             dataobj.wrong += 1
@@ -239,19 +239,20 @@ class UserData(db.Model):
             'user_id': uid, 
             'vtype_id': tid
         }
-        ten_years = datetime.utcnow() + timedelta(minutes=5126400)
+        utcnow = datetime.utcnow()
+        ten_years = utcnow + timedelta(minutes=5126400)
         dataobj = cls.query.filter_by(**datadict).first()
         if dataobj:
             if dataobj.stage < len(cls.forget_time):
-                dataobj.stage += 1
+                dataobj.stage = 10
             dataobj.timestamp = ten_years
-            dataobj.last_practice = ten_years
+            dataobj.last_practice = utcnow
             dataobj.correct += 1
             db.session.commit()
         else:
             dataobj = cls(**datadict)
             dataobj.timestamp = ten_years
-            dataobj.last_practice = ten_years
+            dataobj.last_practice = utcnow
             db.session.add(dataobj)
             db.session.flush()
             return True
