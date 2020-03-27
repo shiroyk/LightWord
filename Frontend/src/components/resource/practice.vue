@@ -63,7 +63,7 @@
                 :disabled="inputDisabled"
                 @click="showWord = false"
                 v-on:input="showWord = false"
-                @keyup.enter="nextCard"
+                @keyup.enter="nextFlag && nextCard()"
               />
             </span>
             <span>{{cardData.example.split[1]}}</span>
@@ -81,13 +81,9 @@
       <div
         class="d-flex align-center right-arrow"
         :class="{'card-slide-btn-xs': $vuetify.breakpoint.xs, 'card-slide-btn': $vuetify.breakpoint.smAndUp}"
-        @click="nextCard"
+        @click="nextFlag && nextCard()"
       >
-        <v-icon
-          color="light-blue accent-4"
-          :large="$vuetify.breakpoint.smAndUp"
-          v-show="rightbtn"
-        >mdi-chevron-right</v-icon>
+        <v-icon color="light-blue accent-4" :large="$vuetify.breakpoint.smAndUp">mdi-chevron-right</v-icon>
       </div>
     </div>
   </div>
@@ -109,22 +105,23 @@ export default {
     card: 0,
     currentCard: 0,
     cardData: {
-        "additional": "",
-        "example": {
-            "sentence": "",
-            "split": ["", ""],
-            "translation": "",
-            "word": ""
-        },
-        "id": 0,
-        "inflection": [],
-        "meaning": "",
-        "pronounce": "",
-        "status": "",
-        "vtype": 0,
-        "word": ""
+      additional: "",
+      example: {
+        sentence: "",
+        split: ["", ""],
+        translation: "",
+        word: ""
+      },
+      id: 0,
+      inflection: [],
+      meaning: "",
+      pronounce: "",
+      status: "",
+      vtype: 0,
+      word: ""
     },
-    rightbtn: true,
+    nextFlag: true,
+    wrongFlag: false,
     leftbtn: true,
     isLoading: false,
     inputDisabled: false
@@ -153,32 +150,27 @@ export default {
           this.isLoading = false;
           this.$nextTick(() => {
             this.$refs.inputword.focus();
-          })
+          });
         })
         .catch(error => {
           console.log(error);
         });
     },
     putData(status) {
-      this.$axios
-        .put("/resource/exercise/status", {
-          word: this.cardData.id,
-          vtype: this.cardData.vtype,
-          status: status
-        })
-        .then(response => {
-          if (response.data.added == this.target && this.targetDialog) {
-            this.targetDialog = false
-            this.$dialog("Message", {
-              message: "<p class='text-center'>今日目标已完成</p>",
-              color: "primary",
-              timeout: 0
-            });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      return new Promise(resolve => {
+        this.$axios
+          .put("/resource/exercise/status", {
+            word: this.cardData.id,
+            vtype: this.cardData.vtype,
+            status: status
+          })
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
     },
     prevCard() {
       if (this.card > 0) {
@@ -219,14 +211,29 @@ export default {
           this.cardData.inflection.includes(inputValue)
         ) {
           // 如果结果正确
-          this.putData(1)
+          this.nextFlag = false;
+          // 防止多次执行
           this.correct = true;
+          await this.playVoice().then(() => {
+            this.nextFlag = true;
+            // 重置执行状态
+            this.correct = false;
+          });
+          this.putData(1).then(data => {
+            if (data.added == this.target && this.targetDialog) {
+              this.targetDialog = false;
+              this.$dialog("Message", {
+                message: "<p class='text-center'>今日目标已完成</p>",
+                color: "primary",
+                timeout: 0
+              });
+            }
+          });
           this.$refs.inputword.value = this.cardData.word;
-          await this.playVoice();
-          this.correct = false;
 
           this.card += 1;
-          this.$refs.inputword.value = ""; 
+          this.$refs.inputword.value = "";
+
           if (this.card < this.cardArray.length) {
             this.currentCard = this.card;
             this.cardData = this.cardArray[this.card];
@@ -235,19 +242,27 @@ export default {
             this.currentCard = 0;
             this.getResource();
           }
-          
+
+          this.wrongFlag = false;
+          // 重置传递状态
         } else {
           // 如果结果错误
           this.wrong = true;
-          this.putData(2);
-          this.$refs.inputword.value = "";
           this.showWord = true;
-          setTimeout(
-            () => ((this.showWord = false), (this.wrong = false)),
-            3000
-          );
+          this.$refs.inputword.value = "";
+          if (!this.wrongFlag) {
+            this.putData(2).then(() => {
+              this.wrongFlag = true;
+              // 防止多次传递给后端
+              setTimeout(
+                () => ((this.showWord = false), (this.wrong = false)),
+                3000
+              );
+            });
+          }
         }
       } else {
+        // 前后卡片
         this.card += 1;
         this.cardData = this.cardArray[this.card];
         if (this.currentCard > this.card) {
@@ -274,7 +289,7 @@ export default {
     }
   },
   created() {
-    this.getResource();    
+    this.getResource();
   },
   mounted() {
     this.getTarget();

@@ -40,7 +40,7 @@ def vocabulary(path):
         db.session.bulk_insert_mappings(Vocabulary, result)
         click.echo("%s: Import Vocabulary complete" % __name__)
     except:
-        click.ClickException('Import Vocabulary failed')
+        raise click.ClickException('Import Vocabulary failed')
 
 @app.cli.command()
 @click.option('--path', default=False, help='Import Vocabdata from txt file') 
@@ -74,7 +74,7 @@ def vocabdata(path):
         db.session.bulk_insert_mappings(VocabData, result)
         click.echo("%s: Import Vocabdata complete" % __name__)
     except:
-        click.ClickException("Import Vocabdata failed")
+        raise click.ClickException("Import Vocabdata failed")
 
 COV = None
 if os.environ.get('FLASK_COVERAGE'):

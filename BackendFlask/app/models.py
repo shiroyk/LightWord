@@ -212,7 +212,7 @@ class UserData(db.Model):
         else:
             dataobj = cls(**datadict)
             db.session.add(dataobj)
-            return dataobj.id is not None
+            return True
 
     @classmethod
     def forget(cls, wid: int, uid: int, tid: int):
