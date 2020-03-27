@@ -61,8 +61,8 @@
                 spellcheck="false"
                 maxlength="20"
                 :disabled="inputDisabled"
-                @click="showWord = false"
-                v-on:input="showWord = false"
+                @click="showWord = wrong = false"
+                v-on:input="showWord = wrong = false"
                 @keyup.enter="nextFlag && nextCard()"
               />
             </span>
