@@ -58,3 +58,10 @@ class DailyStatisticCache(Caching):
         elif key == 2:
             user_statistic['wrong'] += 1
         cache.set(self.key, user_statistic, timeout=int(self.tomorrow.total_seconds()))
+
+class VerificationCode(Caching):
+    def __init__(self, key):
+        self.key = key
+    
+    def set(self, code, timeout = 3600):
+        return cache.set(self.key, code, timeout = timeout)
