@@ -171,3 +171,34 @@ def create_user():
                         'expires_in': 7200}), 201
     
     return {'message': 'Verification code does not exist or is wrong'}, 400
+
+@api.route('/user/reset', methods=['POST'])
+@limiter.limit('50 per hour') #限制每1小时请求10次
+def reset_user_pass():
+    data = request.get_json()
+    if not data:
+        return {'message': 'You must provide JSON data.'}, 400
+
+    user_mail = data.get('usermail', '').strip()
+    user_pass = data.get('password', '').strip()
+    user_code = data.get('code', '').strip()
+
+    errors = []
+    if not 'code' in data or not user_code:
+        errors.append('Please provide a valid code.')
+    if not 'usermail' in data or not re.match(mail_pattern, user_mail):
+        errors.append('Please specify a valid email address.')
+    if not 'password' in data or not user_pass:
+        errors.append('Please provide a valid password.')
+
+    if errors:
+        return {'message': errors}, 400
+
+    if verifiy_code(user_mail, user_code):
+        user = User.query.filter_by(usermail = user_mail).first()
+        user.usermail = user_mail
+        user.hash_password(user_pass)
+        db.session.commit()
+        return jsonify({'message': 'Password reset successful.'}), 200
+    
+    return {'message': 'Verification code does not exist or is wrong.'}, 400

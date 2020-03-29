@@ -2,23 +2,9 @@
   <v-form ref="form" v-model="valid" lazy-validation>
     <div style="padding: 16px 16px 0px 16px">
       <v-text-field
-        v-model="username"
-        :counter="10"
-        :rules="nameRules"
-        label="Username"
-        required
-        outlined
-        rounded
-        dense
-        :error="messages.length > 0"
-        @focus="clearMessages"
-        v-on:input="clearMessages"
-      ></v-text-field>
-
-      <v-text-field
         v-model="usermail"
         :rules="emailRules"
-        label="Email"
+        label="Email Address"
         required
         outlined
         rounded
@@ -42,7 +28,6 @@
           </v-btn>
         </template>
       </v-text-field>
-
       <v-text-field
         v-model="code"
         :counter="6"
@@ -56,7 +41,6 @@
         @focus="clearMessages"
         v-on:input="clearMessages"
       ></v-text-field>
-
       <v-text-field
         v-model="password"
         :rules="passRules"
@@ -73,13 +57,7 @@
         v-on:input="clearMessages"
       ></v-text-field>
     </div>
-    <v-btn
-      :disabled="!valid"
-      color="success"
-      @click="register"
-      tile
-      block
-    >Register</v-btn>
+    <v-btn :disabled="!valid" tile block color="success" @click="reset">Reset Password</v-btn>
   </v-form>
 </template>
 
@@ -91,11 +69,6 @@ export default {
     show: false,
     disableCode: false,
     countTime: 60,
-    username: "",
-    nameRules: [
-      v => !!v || "Usuername is required",
-      v => (v && v.length <= 10) || "Username must be less than 10 characters"
-    ],
     usermail: "",
     emailRules: [
       v => !!v || "Email is required",
@@ -117,32 +90,32 @@ export default {
   }),
   computed: {
     ...mapState({
-      messages: state => state.auth.register.messages
+      messages: state => state.auth.resetpass.messages
     })
   },
   methods: {
-    register() {
+    reset() {
       this.$store
-        .dispatch("register", {
-          username: this.username,
+        .dispatch("resetPass", {
           usermail: this.usermail,
           password: this.password,
           code: this.code
         })
-        .then(() => {
-          this.$dialog("Register successful...", {
-            color: "success",
-            showClose: false,
-            progress: "linear",
-            push: "/home"
-          });
+        .then(data => {
+          if (data.status == 200) {
+            this.$dialog("Successful", {
+                message: "<p class='text-center'>重置密码成功</p>",
+                color: "success",
+                timeout: 0
+              });
+          }
         })
         .catch(error => {
           console.log(error);
         });
     },
     clearMessages() {
-      this.$store.commit("registerMessage", []);
+      this.$store.commit("resetPassMessage", []);
     },
     sendCode() {
       if (!this.disableCode) {

@@ -45,5 +45,5 @@ def custom_error(app):
     @app.errorhandler(429)
     def ratelimit_handler(e):
         return {
-            "message": "ratelimit exceeded %s" % e.description
+            "message": "Too many requests, %s" % e.description
         }, 429

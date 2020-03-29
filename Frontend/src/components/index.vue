@@ -85,7 +85,7 @@
             <register></register>
           </v-tab-item>
           <v-tab-item :transition="false" :reverse-transition="false">
-            <login></login>
+            <resetpass></resetpass>
           </v-tab-item>
         </v-tabs>
       </v-card>
@@ -97,13 +97,15 @@
 import { mapState } from "vuex";
 import Login from "@/components/auth/login";
 import Register from "@/components/auth/register";
+import resetPass from "@/components/auth/resetPass";
 export default {
   props: {
     source: String
   },
   components: {
     login: Login,
-    register: Register
+    register: Register,
+    resetpass: resetPass
   },
   computed: {
     ...mapState({

@@ -10,6 +10,9 @@ const authStore = {
     },
     register: {
       messages: [],
+    },
+    resetpass:{
+      messages: [],
     }
   },
   getters: {},
@@ -27,6 +30,9 @@ const authStore = {
     },
     registerMessage(state, messages) {
       state.register.messages = messages
+    },
+    resetPassMessage(state, messages) {
+      state.resetpass.messages = messages
     },
   },
   actions: {
@@ -61,10 +67,28 @@ const authStore = {
           .catch((error) => {
             if (error.response.status == 400) {
               commit("registerMessage", error.response.data.message)
+            } else if (error.response.status == 429) {
+              commit("registerMessage", [error.response.data.message])
             }
             reject(error)
           })
         })
+    },
+    resetPass({commit}, user) {
+      return new Promise((resolve, reject) => { 
+        axios.post('/user/reset', user
+          ).then((response) => {
+            resolve(response)
+          })
+          .catch((error) => {
+            if (error.response.status == 400) {
+              commit("resetPassMessage", error.response.data.message)
+            } else if (error.response.status == 429) {
+              commit("resetPassMessage", [error.response.data.message])
+            }
+            reject(error)
+          })
+        }) 
     },
     refreshToken({commit}) {
       return new Promise((resolve, reject) => { 

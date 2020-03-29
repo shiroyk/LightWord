@@ -10,7 +10,7 @@
         rounded
         dense
         autocomplete
-        :error-messages="messages"
+        :error="messages.length > 0"
         @focus="clearMessages"
         v-on:input="clearMessages"
       ></v-text-field>
@@ -26,6 +26,9 @@
         dense
         autocomplete
         @click:append="show = !show"
+        :error-messages="messages"
+        @focus="clearMessages"
+        v-on:input="clearMessages"
       ></v-text-field>
     </div>
     <v-btn :disabled="!valid" tile block color="success" @click="login">Login</v-btn>
