@@ -173,7 +173,7 @@ def create_user():
     return {'message': 'Verification code does not exist or is wrong'}, 400
 
 @api.route('/user/reset', methods=['POST'])
-@limiter.limit('50 per hour') #限制每1小时请求10次
+@limiter.limit('10 per hour') #限制每1小时请求10次
 def reset_user_pass():
     data = request.get_json()
     if not data:

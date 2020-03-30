@@ -27,16 +27,10 @@ const authStore = {
     },
     loginMessage(state, messages) {
       state.login.messages = messages
-    },
-    registerMessage(state, messages) {
-      state.register.messages = messages
-    },
-    resetPassMessage(state, messages) {
-      state.resetpass.messages = messages
-    },
+    }
   },
   actions: {
-    login({commit}, user){
+    login({commit}, user) {
       return new Promise((resolve, reject) => { 
         axios.post('/token', {},{
             auth: user
@@ -55,40 +49,10 @@ const authStore = {
           })
         })
     },
-    register({commit}, user){
-      return new Promise((resolve, reject) => { 
-        axios.post('/user', user
-          ).then((response) => {
-            if (response.status == 201) {
-              commit('updateToken', response.data.token);
-            }
-            resolve(response)
-          })
-          .catch((error) => {
-            if (error.response.status == 400) {
-              commit("registerMessage", error.response.data.message)
-            } else if (error.response.status == 429) {
-              commit("registerMessage", [error.response.data.message])
-            }
-            reject(error)
-          })
-        })
-    },
-    resetPass({commit}, user) {
-      return new Promise((resolve, reject) => { 
-        axios.post('/user/reset', user
-          ).then((response) => {
-            resolve(response)
-          })
-          .catch((error) => {
-            if (error.response.status == 400) {
-              commit("resetPassMessage", error.response.data.message)
-            } else if (error.response.status == 429) {
-              commit("resetPassMessage", [error.response.data.message])
-            }
-            reject(error)
-          })
-        }) 
+    logout({commit}) {
+      return new Promise(() => {
+        commit('removeToken')
+      })
     },
     refreshToken({commit}) {
       return new Promise((resolve, reject) => { 

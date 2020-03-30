@@ -73,24 +73,18 @@
         v-on:input="clearMessages"
       ></v-text-field>
     </div>
-    <v-btn
-      :disabled="!valid"
-      color="success"
-      @click="register"
-      tile
-      block
-    >Register</v-btn>
+    <v-btn :disabled="!valid" color="success" @click="register" tile block>Register</v-btn>
   </v-form>
 </template>
 
 <script>
-import { mapState } from "vuex";
 export default {
   data: () => ({
     valid: true,
     show: false,
     disableCode: false,
     countTime: 60,
+    messages: [],
     username: "",
     nameRules: [
       v => !!v || "Usuername is required",
@@ -115,54 +109,58 @@ export default {
       v => (v && v.length == 6) || "Verifiy code must have 6 characters"
     ]
   }),
-  computed: {
-    ...mapState({
-      messages: state => state.auth.register.messages
-    })
-  },
   methods: {
     register() {
-      this.$store
-        .dispatch("register", {
+      this.$axios
+        .post("/user", {
           username: this.username,
           usermail: this.usermail,
           password: this.password,
           code: this.code
         })
-        .then(() => {
-          this.$dialog("Register successful...", {
-            color: "success",
-            showClose: false,
-            progress: "linear",
-            push: "/home"
-          });
+        .then(response => {
+          if (response.status == 201) {
+            this.$store.commit("updateToken", response.data.token);
+            this.$dialog("Register successful...", {
+              color: "success",
+              showClose: false,
+              progress: "linear",
+              push: "/home"
+            });
+          }
         })
         .catch(error => {
-          console.log(error);
+          let errorStatus = error.response.status
+          if (errorStatus == 400 || errorStatus == 429) {
+            this.messages = error.response.data.message;
+          }
         });
     },
     clearMessages() {
-      this.$store.commit("registerMessage", []);
+      this.messages = [];
     },
     sendCode() {
       if (!this.disableCode) {
-        this.disableCode = true;
         this.$axios
           .get(`/user/verification/${this.usermail}`, {})
           .then(response => {
             console.log(response);
+            this.disableCode = true;
+            let countDown = window.setInterval(() => {
+              this.countTime--;
+              if (this.countTime < 0) {
+                window.clearInterval(countDown);
+                this.countTime = 60;
+                this.disableCode = false;
+              }
+            }, 1000);
           })
           .catch(error => {
-            console.log(error);
+            let errorStatus = error.response.status
+            if (errorStatus == 400 || errorStatus == 429) {
+              this.messages = error.response.data.message;
+            }
           });
-        let countDown = window.setInterval(() => {
-          this.countTime--;
-          if (this.countTime < 0) {
-            window.clearInterval(countDown);
-            this.countTime = 60;
-            this.disableCode = false;
-          }
-        }, 1000);
       }
     }
   }

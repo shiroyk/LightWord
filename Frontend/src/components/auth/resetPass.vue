@@ -21,7 +21,7 @@
             small
             @click="sendCode"
           >
-            <v-icon v-show="!disableCode">mdi-send</v-icon>
+            <v-icon>mdi-send</v-icon>
             <template v-slot:loader>
               <span>{{countTime + 's'}}</span>
             </template>
@@ -62,13 +62,13 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 export default {
   data: () => ({
     valid: true,
     show: false,
     disableCode: false,
     countTime: 60,
+    messages: [],
     usermail: "",
     emailRules: [
       v => !!v || "Email is required",
@@ -88,54 +88,55 @@ export default {
       v => (v && v.length == 6) || "Verifiy code must have 6 characters"
     ]
   }),
-  computed: {
-    ...mapState({
-      messages: state => state.auth.resetpass.messages
-    })
-  },
   methods: {
     reset() {
-      this.$store
-        .dispatch("resetPass", {
+      this.$axios
+        .post("/user/reset", {
           usermail: this.usermail,
           password: this.password,
           code: this.code
         })
-        .then(data => {
-          if (data.status == 200) {
+        .then(response => {
+          if (response.status == 200) {
             this.$dialog("Successful", {
-                message: "<p class='text-center'>重置密码成功</p>",
-                color: "success",
-                timeout: 0
-              });
+              message: "<p class='text-center'>重置密码成功</p>",
+              color: "success",
+              timeout: 0
+            });
           }
         })
         .catch(error => {
-          console.log(error);
+          let errorStatus = error.response.status
+          if (errorStatus == 400 || errorStatus == 429) {
+            this.messages = error.response.data.message;
+          }
         });
     },
     clearMessages() {
-      this.$store.commit("resetPassMessage", []);
+      this.messages = [];
     },
     sendCode() {
       if (!this.disableCode) {
-        this.disableCode = true;
         this.$axios
           .get(`/user/verification/${this.usermail}`, {})
           .then(response => {
             console.log(response);
+            this.disableCode = true;
+            let countDown = window.setInterval(() => {
+              this.countTime--;
+              if (this.countTime < 0) {
+                window.clearInterval(countDown);
+                this.countTime = 60;
+                this.disableCode = false;
+              }
+            }, 1000);
           })
           .catch(error => {
-            console.log(error);
+            let errorStatus = error.response.status
+            if (errorStatus == 400 || errorStatus == 429) {
+              this.messages = error.response.data.message;
+            }
           });
-        let countDown = window.setInterval(() => {
-          this.countTime--;
-          if (this.countTime < 0) {
-            window.clearInterval(countDown);
-            this.countTime = 60;
-            this.disableCode = false;
-          }
-        }, 1000);
       }
     }
   }

@@ -76,7 +76,7 @@
         <v-tab-item>
           <v-card flat>
             <v-card-text>
-              <p>Account setting</p>
+              <resetpass/>
             </v-card-text>
           </v-card>
         </v-tab-item>
@@ -86,9 +86,13 @@
 </template>
 
 <script>
+import resetPass from "@/components/auth/resetPass";
 export default {
   props: {
     source: String
+  },
+  components: {
+    resetpass: resetPass
   },
   data: () => ({
     valid: true,

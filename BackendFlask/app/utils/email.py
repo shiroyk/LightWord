@@ -24,7 +24,7 @@ def send_email(subject, sender, recipients, msg_body, msg_html,
     message.html = msg_html
 
     @copy_current_request_context
-    def send_message(message,):
+    def send_message(message):
         try:
             mail.send(message)
         except Exception as e:
