@@ -128,7 +128,7 @@ export default {
   }),
   methods: {
     getTarget() {
-      if (this.target.length > 0) return;
+      if (this.target != null) return;
 
       this.$axios
         .get("/user/config", {})
