@@ -16,6 +16,12 @@ else
     echo "Database doesn't need to be initialized."
 fi
 
-echo "Run migrations." && flask db upgrade || echo "Upgrade db failed."
+echo "Run migrations." && flask db upgrade
+
+if [ $? == 0 ]; then
+    echo "All done."
+else
+    echo "Upgrade db failed."
+fi
 
 gunicorn -c config/gunicorn.py lightword:app --log-config config/logging.conf

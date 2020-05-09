@@ -5,7 +5,7 @@ import logging, logging.config
 from sqlalchemy.engine import reflection
 from flask_migrate import stamp
 from app import create_app, db
-from app.models import Vocabulary, VocabType, VocabData
+from app.models import User, UserConfig, Vocabulary, VocabType, VocabData
 from config.config import Config
 
 app = create_app(Config)
@@ -23,6 +23,13 @@ def initdb(recreate):
         db.create_all()
         stamp()
         click.echo('%s: Initialized database.' % __name__)
+        user = User(username=Config.FLASKY_ADMIN, usermail=Config.FLASKY_ADMIN_MAIL)
+        user.hash_password('123456')
+        db.session.add(user)
+        db.session.flush()
+        UserConfig.init_config(user.uid)
+        db.session.commit()
+        click.echo('%s: Created default user %s, default password is 123456.' % (__name__, Config.FLASKY_ADMIN))
     else:
         raise click.ClickException('Database already exist.')
 
