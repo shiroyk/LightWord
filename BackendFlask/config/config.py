@@ -16,6 +16,7 @@ class Config(object):
 
     CACHE_REDIS_URL = RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL') or 'redis://redis:6379/0'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'mysql+pymysql://web:123456@db:3306/webdb?charset=utf8'
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

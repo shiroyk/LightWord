@@ -3,9 +3,9 @@ import router from '@/router'
 import store from '@/store'
 
 if (process.env.NODE_ENV == 'development') {    
-  axios.defaults.baseURL = 'http://127.0.0.1:5000';
+  axios.defaults.baseURL = 'http://127.0.0.1/api';
 } else if (process.env.NODE_ENV == 'production') {    
-  axios.defaults.baseURL = 'http://api.shiroyk.moe';
+  axios.defaults.baseURL = 'http://192.168.123.123/api';
 }
 
 axios.defaults.timeout = 5000
