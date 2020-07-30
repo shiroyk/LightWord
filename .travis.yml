@@ -21,14 +21,10 @@ jobs:
         services:
             - docker
         sudo: required
-        addons:
-            hosts:
-              - api.shiroyk.moe
-              - www.shiroyk.moe
         branches:
             only:
                 - master
         script:
             - docker-compose up -d
         after_script:
-            - while [[ "$(curl -X POST -s -o /dev/null -w ''%{http_code}'' 'http://api.shiroyk.moe/token')" != "401" ]]; do sleep 5; done && echo "Backend Ok"
+            - while [[ "$(curl -X POST -s -o /dev/null -w ''%{http_code}'' 'http://localhost/api/token')" != "401" ]]; do sleep 5; done && echo "Backend Ok"
